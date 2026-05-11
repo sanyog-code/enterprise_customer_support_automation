@@ -1,0 +1,38 @@
+# --- Environment & Dependencies ---
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+ 
+# --- Secrets & Keys  ---
+.env
+*.local
+secrets.json
+ 
+# --- Data & Databases ---
+
+faiss_support_db/
+*.faiss
+*.pkl
+*.index
+ 
+# --- Logs & Runtime ---
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+ 
+# --- IDE & System Files ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+ 
+# --- Build & Distribution ---
+dist/
+build/
+*.egg-info/
+ 

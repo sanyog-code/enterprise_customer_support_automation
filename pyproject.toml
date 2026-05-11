@@ -1,0 +1,43 @@
+[project]
+name = "support_bot"
+version = "0.1.0"
+description = "support_bot using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]==1.14.1",
+    "faiss-cpu>=1.13.2",
+    "fastapi>=0.136.1",
+    "graphviz>=0.21",
+    "groq>=0.37.1",
+    "langchain-community>=0.4.1",
+    "langchain-google-genai>=4.2.2",
+    "langchain-groq>=1.1.2",
+    "langchain-huggingface>=1.2.2",
+    "litellm>=1.83.0",
+    "nltk>=3.9.4",
+    "pandas>=2.3.3",
+    "pydantic>=2.11.10",
+    "python-dotenv>=1.1.1",
+    "ragas>=0.4.3",
+    "rank-bm25>=0.2.2",
+    "rouge-score>=0.1.2",
+    "sentence-transformers>=5.4.1",
+    "streamlit>=1.57.0",
+    "uvicorn>=0.46.0",
+]
+
+[project.scripts]
+support_bot = "support_bot.main:run"
+run_crew = "support_bot.main:run"
+train = "support_bot.main:train"
+replay = "support_bot.main:replay"
+test = "support_bot.main:test"
+run_with_trigger = "support_bot.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"

@@ -1,0 +1,35 @@
+analyze_query_task:
+  description: >
+    Extract the main product and error from the user query: '{query}'.
+  expected_output: >
+    A concise list of the Product and Technical Issue.
+  agent: query_understanding_agent
+ 
+analyze_sentiment_task:
+  description: >
+    Determine the emotional tone of the user query: '{query}'.
+  expected_output: >
+    A statement of Sentiment and Urgency Level.
+  agent: sentiment_analysis_agent
+ 
+retrieve_solution_task:
+  description: >
+    Use the Hybrid Knowledge Base Search tool to find a solution.
+  expected_output: >
+    The exact technical resolution steps, or "NO_SOLUTION_FOUND".
+  agent: rag_retrieval_agent
+ 
+draft_response_task:
+  description: >
+    Draft the initial reply. Sign it as '{user_name}'.
+  expected_output: >
+    A drafted customer service response.
+  agent: escalation_resolution_agent
+ 
+quality_review_task:
+  description: >
+    Review the draft. CRITIQUE IT. Ensure it addresses all parts of '{query}' and is signed by '{user_name}'. Rewrite it perfectly.
+  expected_output: >
+    The final, ready-to-send customer service email.
+  agent: quality_assurance_agent
+ 
