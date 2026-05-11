@@ -1,29 +1,43 @@
-name: RAG Agentic CI/CD Pipeline
+name: Support Bot CI/CD Pipeline
  
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
  
 jobs:
-  test-and-build:
+  build:
     runs-on: ubuntu-latest
+ 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
  
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
  
-      - name: Install dependencies
-        run: |
-          pip install uv
-          uv pip install --system .
+    - name: Install dependencies
+      run: |
+        pip install -r requirment.txt
  
-      - name: Build Docker Image
-        run: |
-          docker build -t nexus-support-bot:latest .
+    - name: Run tests
+      run: |
+        echo "No tests yet, add pytest later"
  
+    - name: Build Docker image
+      run: |
+        docker build -t support-bot .
+ 
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+ 
+    - name: Push to DockerHub
+      run: |
+        docker tag support-bot ${{ secrets.DOCKER_USERNAME }}/support-bot:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/support-bot:latest 
