@@ -3,38 +3,45 @@ FROM python:3.11-slim AS builder
  
 WORKDIR /app
  
-# Install build-essential for packages that need to compile code
+# Install build dependencies
 RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
  
-# Copy the requirements file
+# 1. Create a virtual environment
+RUN python -m venv /opt/venv
+ 
+# 2. Activate the virtual environment for all future commands
+ENV PATH="/opt/venv/bin:$PATH"
+ 
+# Copy and install requirements (This installs INTO the venv)
 COPY requirment.txt .
+RUN pip install --no-cache-dir -r requirment.txt
  
-# Install dependencies into a prefix folder
-RUN pip install --no-cache-dir --prefix=/install -r requirment.txt
- 
-# Copy necessary files to build the database
+# Copy data and build script
 COPY customer_support_tickets.csv create_db.py ./
  
-# Build the FAISS database during the image build
+# Build the database (Python now sees pandas perfectly!)
 RUN python create_db.py
  
 # Stage 2: Final Runtime Image
 FROM python:3.11-slim
 WORKDIR /app
  
-# Copy libraries from the builder
-COPY --from=builder /install /usr/local
+# Copy the entire virtual environment from the builder
+COPY --from=builder /opt/venv /opt/venv
  
-# Copy your source code and config
+# Activate the virtual environment in the final image
+ENV PATH="/opt/venv/bin:$PATH"
+ 
+# Copy your source code
 COPY . .
  
-# Ensure the FAISS database is copied over
+# Copy the FAISS database generated in the builder stage
 COPY --from=builder /app/faiss_support_db ./faiss_support_db
  
 # Expose ports for Backend and Frontend
 EXPOSE 8000
 EXPOSE 8501
  
-# Start the Backend by default
-CMD ["uvicorn", "api.py:app", "--host", "0.0.0.0", "--port", "8000"]
-  
+# Start the Backend (Make sure it's api:app, not api.py:app)
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+   
