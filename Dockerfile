@@ -1,43 +1,40 @@
-# Stage 1: Build & Dependency Installation
+# Stage 1: Build & FAISS Generation
 FROM python:3.11-slim AS builder
  
 WORKDIR /app
  
-# Install uv for fast dependency management
-RUN pip install uv
+# Install build-essential for packages that need to compile code
+RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
  
-# Copy only the dependency files first to leverage Docker cache
-COPY pyproject.toml uv.lock requirment.txt ./
+# Copy the requirements file
+COPY requirment.txt .
  
-# Install dependencies into the system path
-# We use the requirements file directly to avoid the "package" error
-RUN uv pip install --system -r requirment.txt
+# Install dependencies into a prefix folder
+RUN pip install --no-cache-dir --prefix=/install -r requirment.txt
  
-# Copy the data and the script to build the FAISS database
+# Copy necessary files to build the database
 COPY customer_support_tickets.csv create_db.py ./
  
-# --- THE FAISS BUILD STEP ---
-# This runs DURING the build, so the database is baked into the image
+# Build the FAISS database during the image build
 RUN python create_db.py
  
 # Stage 2: Final Runtime Image
 FROM python:3.11-slim
 WORKDIR /app
  
-# Copy installed packages from builder
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# Copy libraries from the builder
+COPY --from=builder /install /usr/local
  
-# Copy all project files
+# Copy your source code and config
 COPY . .
  
-# Copy the FAISS database generated in the builder stage
+# Ensure the FAISS database is copied over
 COPY --from=builder /app/faiss_support_db ./faiss_support_db
  
-# Expose ports for both FastAPI (8000) and Streamlit (8501)
+# Expose ports for Backend and Frontend
 EXPOSE 8000
 EXPOSE 8501
  
-# Default command (starts the backend)
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
- 
+# Start the Backend by default
+CMD ["uvicorn", "api.py:app", "--host", "0.0.0.0", "--port", "8000"]
+  
