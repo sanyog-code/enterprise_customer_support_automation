@@ -65,7 +65,7 @@ jobs:
           
           echo "[TEST] Running Health Check on deployed endpoint..."
           # If the container crashes due to bad code or bad keys, this curl fails and triggers Rollback
-          curl -f http://localhost:8000/ || exit 1
+          curl -f http://localhost:8000/docs || exit 1
           echo " Validation Passed. Container is healthy."
  
       - name: Automated Rollback Strategy
